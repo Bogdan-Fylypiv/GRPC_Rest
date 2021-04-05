@@ -9,6 +9,7 @@ com/example/grpc/server/grpcserver/MatrixServiceGrpc.class
 com/example/grpc/server/grpcserver/AddRequest$Builder.class
 com/example/grpc/server/grpcserver/AddResponse$Builder.class
 com/example/grpc/server/grpcserver/AddResponse.class
+com/example/grpc/client/grpcclient/GRPCClientService.class
 com/example/grpc/server/grpcserver/MatrixServiceGrpc$MatrixServiceStub.class
 com/example/grpc/server/grpcserver/MultiplyRequest.class
 com/example/grpc/server/grpcserver/MultiplyResponse$1.class
@@ -18,7 +19,11 @@ com/example/grpc/server/grpcserver/AddRequest$1.class
 com/example/grpc/server/grpcserver/MatrixServiceGrpc$MatrixServiceImplBase.class
 com/example/grpc/server/grpcserver/MatrixServiceGrpc$MethodHandlers.class
 com/example/grpc/server/grpcserver/MultiplyResponse$Builder.class
+com/example/grpc/server/grpcserver/MatrixServiceOuterClass$1.class
 com/example/grpc/server/grpcserver/MatrixServiceGrpc$1.class
 com/example/grpc/server/grpcserver/MatrixServiceGrpc$MatrixServiceFutureStub.class
 com/example/grpc/server/grpcserver/MultiplyRequestOrBuilder.class
 com/example/grpc/server/grpcserver/AddResponseOrBuilder.class
+com/example/grpc/server/grpcserver/MatrixServiceOuterClass.class
+com/example/grpc/client/grpcclient/MatrixEndpoint.class
+com/example/grpc/client/grpcclient/GrpcClientApplication.class

@@ -99,10 +99,7 @@ public class GRPCClientService {
 
                 final ArrayList<MatrixServiceGrpc.MatrixServiceBlockingStub> stubs = new ArrayList<>();
                 final ArrayList<MultiplyRequest> requests = new ArrayList<>();
-                final ArrayList<MultiplyResponse> multResponses = new ArrayList<>(7);
-
-		for (int i = 0; i < 7; i++)
-			multResponses.add(null);
+                final ArrayList<MultiplyResponse> multResponses = new ArrayList<>();
 
                 initialiseStubs(ipAddresses, stubs);
 
@@ -142,12 +139,11 @@ public class GRPCClientService {
 
                 addRequests(requests, listA1, listA2, listB1, listB2, listC1, listC2, listD1, listD2);
 
-
 		System.out.println("Measuring time");
                 int footprint = (int)measureMultTime(stub, listA1, listA2, A4);
                 System.out.println("Time taken: " + footprint);
 		double numServers = Math.ceil((footprint * 7) / deadline);
-		numServers = numServers == 0.0 ? 1.0 : numServers;
+		numServers = numServers == 0 ? 1 : numServers;
 
 		System.out.println("Servers required: " + numServers);
 
@@ -243,14 +239,14 @@ public class GRPCClientService {
 		System.out.println("Multiplying");
                 if(numServers == 1){
                         Runnable runnableTask = () -> {
-                                multResponses.set(0, stubs.get(0).multiply(requests.get(0)));
-                                multResponses.set(1, stubs.get(0).multiply(requests.get(1)));
-                                multResponses.set(2, stubs.get(0).multiply(requests.get(2)));
-                                multResponses.set(3, stubs.get(0).multiply(requests.get(3)));
-                                multResponses.set(4, stubs.get(0).multiply(requests.get(4)));
-                                multResponses.set(5, stubs.get(0).multiply(requests.get(5)));
-                                multResponses.set(6, stubs.get(0).multiply(requests.get(6)));
-                                multResponses.set(7, stubs.get(0).multiply(requests.get(7)));
+                                multResponses.add(stubs.get(0).multiply(requests.get(0)));
+                                multResponses.add(stubs.get(0).multiply(requests.get(1)));
+                                multResponses.add(stubs.get(0).multiply(requests.get(2)));
+                                multResponses.add(stubs.get(0).multiply(requests.get(3)));
+                                multResponses.add(stubs.get(0).multiply(requests.get(4)));
+                                multResponses.add(stubs.get(0).multiply(requests.get(5)));
+                                multResponses.add(stubs.get(0).multiply(requests.get(6)));
+                                multResponses.add(stubs.get(0).multiply(requests.get(7)));
                         };
                         executor.execute(runnableTask);
                 }
@@ -289,11 +285,11 @@ public class GRPCClientService {
                 }
                 else if(numServers == 4){
                         Runnable runnableTask = () -> {
-                                multResponses.set(0, stubs.get(0).multiply(requests.get(0)));
-                                multResponses.set(1, stubs.get(0).multiply(requests.get(1)));
+                                multResponses.add(stubs.get(0).multiply(requests.get(0)));
+                                multResponses.add(stubs.get(0).multiply(requests.get(1)));
                         };
                         Runnable runnableTask1 = () -> {
-                                multResponses.set(2, stubs.get(1).multiply(requests.get(2)));
+                                multResponses.add(stubs.get(1).multiply(requests.get(2)));
                                 multResponses.set(3, stubs.get(1).multiply(requests.get(3)));
                         };
                         Runnable runnableTask2 = () -> {
