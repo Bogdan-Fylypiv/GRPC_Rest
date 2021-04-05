@@ -42,7 +42,6 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase{
 
         @Override
         public void multiply(MultiplyRequest request, StreamObserver<MultiplyResponse> reply){
-		System.out.println("Request received");
                 List<java.lang.Integer> matrix1 = request.getMatrix1List();
                 List<java.lang.Integer> matrix2 = request.getMatrix2List();
                 int size = Math.sqrt(matrix1.size());
@@ -50,7 +49,7 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase{
                 int A[][] = new int[size][size];
                 int B[][] = new int[size][size];
                 int c = 0;
-		System.out.println(size);
+
                 for(int i = 0; i < size; i++){
                         for(int j = 0; j < size; j++){
                                 A[i][j] = matrix1.get(c);

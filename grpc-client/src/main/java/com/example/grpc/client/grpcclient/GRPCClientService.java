@@ -227,8 +227,8 @@ public class GRPCClientService {
                 List<java.lang.Integer> result = multResponse.getMatrixList();
                 int c = 0;
 		System.out.println(result.size());
-                for(int i = 0; i < list1.size(); i++){
-                        for(int j = 0; j < list1.size(); j++){
+                for(int i = 0; i < result.size(); i++){
+                        for(int j = 0; j < result.size(); j++){
                                 A4[i][j] = result.get(c);
                                 c++;
                         }
