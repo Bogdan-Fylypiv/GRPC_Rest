@@ -23,6 +23,6 @@ com/example/grpc/server/grpcserver/GrpcServerApplication.class
 com/example/grpc/server/grpcserver/MatrixServiceOuterClass$1.class
 com/example/grpc/server/grpcserver/MatrixServiceGrpc$1.class
 com/example/grpc/server/grpcserver/MatrixServiceGrpc$MatrixServiceFutureStub.class
-com/example/grpc/server/grpcserver/AddResponseOrBuilder.class
 com/example/grpc/server/grpcserver/MultiplyRequestOrBuilder.class
+com/example/grpc/server/grpcserver/AddResponseOrBuilder.class
 com/example/grpc/server/grpcserver/MatrixServiceOuterClass.class

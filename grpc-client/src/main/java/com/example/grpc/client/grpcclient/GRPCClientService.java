@@ -140,7 +140,7 @@ public class GRPCClientService {
                 addRequests(requests, listA1, listA2, listB1, listB2, listC1, listC2, listD1, listD2);
 
                 long footprint = measureMultTime(stub, listA1, listA2, A4);
-                double numServers = Math.ceil((footprint * 7) / deadline);
+                int numServers = (int)Math.ceil((footprint * 7) / deadline);
                 double multPerServer = 7 / numServers;
 
                 StreamObserver<MultiplyRequest> requestObserver;
@@ -148,14 +148,18 @@ public class GRPCClientService {
 
 		System.out.println("Sending multiply requests");
 
-                ExecutorService executor = Executors.newFixedThreadPool(1);
-		Runnable runnableTask = () -> {
-                	multiply(multResponses, stubs, requests, numServers);
-		};
-                executor.execute(runnableTask);
-
-                System.out.println("Awaiting responses");
-                executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+		try{
+                	ExecutorService executor = Executors.newFixedThreadPool(1);
+			Runnable runnableTask = () -> {
+	                	multiply(multResponses, stubs, requests, numServers);
+			};
+	                executor.execute(runnableTask);
+			System.out.println("Awaiting responses");
+                	executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+		}
+		catch(InterruptedException e){
+			System.out.println("Interrupted");
+		}
 
 		System.out.println("Sending add requests");
 
@@ -234,10 +238,10 @@ public class GRPCClientService {
                 return footprint;
         }
 
-        static void multiply(ArrayList<MultiplyResponse> multResponses, ArrayList<MatrixServiceGrpc.MatrixServiceBlockingStub> stubs, ArrayList<MultiplyRequest> requests, int numServers)
+        static void multiply(ArrayList<MultiplyResponse> multResponses, ArrayList<MatrixServiceGrpc.MatrixServiceBlockingStub> stubs, ArrayList<MultiplyRequest> requests, int numServers)throws InterruptedException{
                 ExecutorService executor = Executors.newFixedThreadPool(7);
 
-                if(numServers = 1){
+                if(numServers == 1){
                         Runnable runnableTask = () -> {
                                 multResponses.set(0, stubs.get(0).multiply(requests.get(0)));
                                 multResponses.set(1, stubs.get(0).multiply(requests.get(1)));
@@ -250,7 +254,7 @@ public class GRPCClientService {
                         };
                         executor.execute(runnableTask);
                 }
-                else if(numServers = 2){
+                else if(numServers == 2){
                         Runnable runnableTask = () -> {
                                 multResponses.set(0, stubs.get(0).multiply(requests.get(0)));
                                 multResponses.set(1, stubs.get(0).multiply(requests.get(1)));
@@ -265,7 +269,7 @@ public class GRPCClientService {
                         executor.execute(runnableTask);
                         executor.execute(runnableTask1);
                 }
-                else if(numServers = 3){
+                else if(numServers == 3){
                         Runnable runnableTask = () -> {
                                 multResponses.set(0, stubs.get(0).multiply(requests.get(0)));
                                 multResponses.set(1, stubs.get(0).multiply(requests.get(1)));
@@ -283,7 +287,7 @@ public class GRPCClientService {
                         executor.execute(runnableTask1);
                         executor.execute(runnableTask2);
                 }
-                else if(numServers = 4){
+                else if(numServers == 4){
                         Runnable runnableTask = () -> {
                                 multResponses.set(0, stubs.get(0).multiply(requests.get(0)));
                                 multResponses.set(1, stubs.get(0).multiply(requests.get(1)));
@@ -304,7 +308,7 @@ public class GRPCClientService {
                         executor.execute(runnableTask2);
                         executor.execute(runnableTask3);
                 }
-                else if(numServers = 5){
+                else if(numServers == 5){
                         Runnable runnableTask = () -> {
                                 multResponses.set(0, stubs.get(0).multiply(requests.get(0)));
                                 multResponses.set(1, stubs.get(0).multiply(requests.get(1)));
@@ -326,7 +330,7 @@ public class GRPCClientService {
                         executor.execute(runnableTask2);
                         executor.execute(runnableTask3);
                 }
-                else if(numServers = 6){
+                else if(numServers == 6){
 
                         Runnable runnableTask = () -> {
                                 multResponses.set(0, stubs.get(0).multiply(requests.get(0)));
@@ -352,7 +356,7 @@ public class GRPCClientService {
                         executor.execute(runnableTask4);
 
                 }
-                else if(numServers = 7){
+                else if(numServers == 7){
                         Runnable runnableTask = () -> {
                                 multResponses.set(0, stubs.get(0).multiply(requests.get(0)));
                         };

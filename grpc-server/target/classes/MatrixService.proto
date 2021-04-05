@@ -26,4 +26,3 @@ service MatrixService{
         rpc add(AddRequest) returns (AddResponse);
         rpc multiply(MultiplyRequest) returns (MultiplyResponse);
 }
-

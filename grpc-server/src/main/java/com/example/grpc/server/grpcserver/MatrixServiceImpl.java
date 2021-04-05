@@ -11,7 +11,7 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase{
         public void add(AddRequest request, StreamObserver<AddResponse> reply){
                 List<java.lang.Integer> matrix1 = request.getMatrix1List();
                 List<java.lang.Integer> matrix2 = request.getMatrix2List();
-                int size = Math.sqrt(matrix1.size());
+                int size = (int)Math.sqrt(matrix1.size());
 
                 int C[][] = new int[size * 2][size * 2];
                 int A[][] = new int[size][size];
@@ -45,7 +45,7 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase{
 		System.out.println("Request received");
                 List<java.lang.Integer> matrix1 = request.getMatrix1List();
                 List<java.lang.Integer> matrix2 = request.getMatrix2List();
-                int size = Math.sqrt(matrix1.size());
+                int size = (int)Math.sqrt(matrix1.size());
                 int C[][] = new int[size * 2][size * 2];
                 int A[][] = new int[size][size];
                 int B[][] = new int[size][size];
