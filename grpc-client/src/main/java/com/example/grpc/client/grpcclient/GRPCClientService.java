@@ -1,6 +1,7 @@
 package com.example.grpc.client.grpcclient;
 
 import java.util.*;
+import java.lang.Math;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicLong;
@@ -145,25 +146,18 @@ public class GRPCClientService {
                 StreamObserver<MultiplyRequest> requestObserver;
                 int c = 0, c1 = 0;
 
-                ExecutorService executor = Executors.newFixedThreadPool(7);
-		Runnable runnableTask;
-		MultiplyResponse multResponse;
-		for(int i = 0; i < numServers; i++){
-                        c1 = c;
-                        if(i == (numServers - 1) && (7 - (multPerServer + c1)) > 0){
-                                c1 += 7 - multPerServer + c;
-                        }
-                        for(int j = c; j < multPerServer + c1; j++){
-				final int ii = i, jj = j;
-				runnableTask = () -> {
-					multResponses.set(jj, stubs.get(ii).multiply(requests.get(jj)));
-				};
-				executor.execute(runnableTask);
-                                c++;
-                        }
-                }
+		System.out.println("Sending multiply requests");
 
+                ExecutorService executor = Executors.newFixedThreadPool(1);
+		Runnable runnableTask = () -> {
+                	multiply(multResponses, stubs, requests, numServers);
+		};
+                executor.execute(runnableTask);
+
+                System.out.println("Awaiting responses");
                 executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+
+		System.out.println("Sending add requests");
 
                 AddResponse addResponse = stub.add(AddRequest.newBuilder()
                         .addAllMatrix1(listA4)
@@ -225,10 +219,10 @@ public class GRPCClientService {
                 .addAllMatrix2(list2).build());
 
                 List<java.lang.Integer> result = multResponse.getMatrixList();
-                int c = 0;
+                int c = 0, size = (int)Math.sqrt(A4.length);
 		System.out.println(result.size());
-                for(int i = 0; i < result.size(); i++){
-                        for(int j = 0; j < result.size(); j++){
+                for(int i = 0; i < size; i++){
+                        for(int j = 0; j < size; j++){
                                 A4[i][j] = result.get(c);
                                 c++;
                         }
@@ -238,6 +232,155 @@ public class GRPCClientService {
                 long footprint = Duration.between(start, finish).toMillis();
 		System.out.println("Time measured");
                 return footprint;
+        }
+
+        static void multiply(ArrayList<MultiplyResponse> multResponses, ArrayList<MatrixServiceGrpc.MatrixServiceBlockingStub> stubs, ArrayList<MultiplyRequest> requests, int numServers)
+                ExecutorService executor = Executors.newFixedThreadPool(7);
+
+                if(numServers = 1){
+                        Runnable runnableTask = () -> {
+                                multResponses.set(0, stubs.get(0).multiply(requests.get(0)));
+                                multResponses.set(1, stubs.get(0).multiply(requests.get(1)));
+                                multResponses.set(2, stubs.get(0).multiply(requests.get(2)));
+                                multResponses.set(3, stubs.get(0).multiply(requests.get(3)));
+                                multResponses.set(4, stubs.get(0).multiply(requests.get(4)));
+                                multResponses.set(5, stubs.get(0).multiply(requests.get(5)));
+                                multResponses.set(6, stubs.get(0).multiply(requests.get(6)));
+                                multResponses.set(7, stubs.get(0).multiply(requests.get(7)));
+                        };
+                        executor.execute(runnableTask);
+                }
+                else if(numServers = 2){
+                        Runnable runnableTask = () -> {
+                                multResponses.set(0, stubs.get(0).multiply(requests.get(0)));
+                                multResponses.set(1, stubs.get(0).multiply(requests.get(1)));
+                                multResponses.set(2, stubs.get(0).multiply(requests.get(2)));
+                                multResponses.set(3, stubs.get(0).multiply(requests.get(3)));
+                        };
+                        Runnable runnableTask1 = () -> {
+                                multResponses.set(4, stubs.get(1).multiply(requests.get(4)));
+                                multResponses.set(5, stubs.get(1).multiply(requests.get(5)));
+                                multResponses.set(6, stubs.get(1).multiply(requests.get(6)));
+                        };
+                        executor.execute(runnableTask);
+                        executor.execute(runnableTask1);
+                }
+                else if(numServers = 3){
+                        Runnable runnableTask = () -> {
+                                multResponses.set(0, stubs.get(0).multiply(requests.get(0)));
+                                multResponses.set(1, stubs.get(0).multiply(requests.get(1)));
+                                multResponses.set(2, stubs.get(0).multiply(requests.get(2)));
+                        };
+                        Runnable runnableTask1 = () -> {
+                                multResponses.set(3, stubs.get(1).multiply(requests.get(3)));
+                                multResponses.set(4, stubs.get(1).multiply(requests.get(4)));
+                                multResponses.set(5, stubs.get(1).multiply(requests.get(5)));
+                        };
+                        Runnable runnableTask2 = () -> {
+	                        multResponses.set(6, stubs.get(2).multiply(requests.get(6)));
+                        };
+                        executor.execute(runnableTask);
+                        executor.execute(runnableTask1);
+                        executor.execute(runnableTask2);
+                }
+                else if(numServers = 4){
+                        Runnable runnableTask = () -> {
+                                multResponses.set(0, stubs.get(0).multiply(requests.get(0)));
+                                multResponses.set(1, stubs.get(0).multiply(requests.get(1)));
+                        };
+                        Runnable runnableTask1 = () -> {
+                                multResponses.set(2, stubs.get(1).multiply(requests.get(2)));
+                                multResponses.set(3, stubs.get(1).multiply(requests.get(3)));
+                        };
+                        Runnable runnableTask2 = () -> {
+                                multResponses.set(4, stubs.get(2).multiply(requests.get(4)));
+                                multResponses.set(5, stubs.get(2).multiply(requests.get(5)));
+                        };
+                        Runnable runnableTask3 = () -> {
+                                multResponses.set(6, stubs.get(3).multiply(requests.get(6)));
+                        };
+                        executor.execute(runnableTask);
+                        executor.execute(runnableTask1);
+                        executor.execute(runnableTask2);
+                        executor.execute(runnableTask3);
+                }
+                else if(numServers = 5){
+                        Runnable runnableTask = () -> {
+                                multResponses.set(0, stubs.get(0).multiply(requests.get(0)));
+                                multResponses.set(1, stubs.get(0).multiply(requests.get(1)));
+                        };
+                        Runnable runnableTask1 = () -> {
+                                multResponses.set(2, stubs.get(1).multiply(requests.get(2)));
+                        };
+                        Runnable runnableTask2 = () -> {
+                                multResponses.set(3, stubs.get(2).multiply(requests.get(3)));
+                                multResponses.set(4, stubs.get(2).multiply(requests.get(4)));
+                        };
+                        Runnable runnableTask3 = () -> {
+                                multResponses.set(5, stubs.get(3).multiply(requests.get(5)));
+                                multResponses.set(6, stubs.get(3).multiply(requests.get(6)));
+                        };
+
+                        executor.execute(runnableTask);
+                        executor.execute(runnableTask1);
+                        executor.execute(runnableTask2);
+                        executor.execute(runnableTask3);
+                }
+                else if(numServers = 6){
+
+                        Runnable runnableTask = () -> {
+                                multResponses.set(0, stubs.get(0).multiply(requests.get(0)));
+                                multResponses.set(1, stubs.get(0).multiply(requests.get(1)));
+                        };
+                        Runnable runnableTask1 = () -> {
+                                multResponses.set(2, stubs.get(1).multiply(requests.get(2)));
+                        };
+                        Runnable runnableTask2 = () -> {
+                                multResponses.set(3, stubs.get(2).multiply(requests.get(3)));
+                        };
+                        Runnable runnableTask3 = () -> {
+                                multResponses.set(5, stubs.get(4).multiply(requests.get(5)));
+                        };
+                        Runnable runnableTask4 = () -> {
+                                multResponses.set(6, stubs.get(5).multiply(requests.get(6)));
+                        };
+
+                        executor.execute(runnableTask);
+                        executor.execute(runnableTask1);
+                        executor.execute(runnableTask2);
+                        executor.execute(runnableTask3);
+                        executor.execute(runnableTask4);
+
+                }
+                else if(numServers = 7){
+                        Runnable runnableTask = () -> {
+                                multResponses.set(0, stubs.get(0).multiply(requests.get(0)));
+                        };
+                        Runnable runnableTask1 = () -> {
+                                multResponses.set(1, stubs.get(1).multiply(requests.get(1)));
+                        };
+                        Runnable runnableTask2 = () -> {
+                                multResponses.set(2, stubs.get(2).multiply(requests.get(2)));
+                        };
+                        Runnable runnableTask3 = () -> {
+                                multResponses.set(3, stubs.get(3).multiply(requests.get(3)));
+                        };
+                        Runnable runnableTask4 = () -> {
+                                multResponses.set(4, stubs.get(4).multiply(requests.get(4)));
+                        };
+                        Runnable runnableTask5 = () -> {
+                                multResponses.set(5, stubs.get(5).multiply(requests.get(5)));
+                        };
+                        multResponses.set(6, stubs.get(6).multiply(requests.get(6)));
+
+                        executor.execute(runnableTask);
+                        executor.execute(runnableTask1);
+                        executor.execute(runnableTask2);
+                        executor.execute(runnableTask3);
+                        executor.execute(runnableTask4);
+                        executor.execute(runnableTask5);
+                }
+                executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
         }
 
        static void addRequests(ArrayList<MultiplyRequest> requests, List<java.lang.Integer> listA1, List<java.lang.Integer> listA2, List<java.lang.Integer> listB1, List<java.lang.Integer> listB2, List<java.lang.Integer> listC1, List<java.lang.Integer> listC2, List<java.lang.Integer> listD1, List<java.lang.Integer> listD2){
