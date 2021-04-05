@@ -102,7 +102,7 @@ public class GRPCClientService {
 
                 initialiseStubs(ipAddresses, stubs);
 
-                ManagedChannel channel = ManagedChannelBuilder.forAddress("localhost", 8081).usePlaintext().build();
+                ManagedChannel channel = ManagedChannelBuilder.forAddress("52.23.164.91", 9090).usePlaintext().build();
 		MatrixServiceGrpc.MatrixServiceBlockingStub stub = MatrixServiceGrpc.newBlockingStub(channel);
 
                 ArrayList<java.lang.Integer> listA1 = new ArrayList<>();
@@ -218,6 +218,7 @@ public class GRPCClientService {
         }
 
         static long measureMultTime(MatrixServiceGrpc.MatrixServiceBlockingStub stub, List<java.lang.Integer> list1, List<java.lang.Integer> list2, int[][] A4){
+		System.out.println("Measuring time");
                 Instant start = Instant.now();
                 MultiplyResponse multResponse = stub.multiply(MultiplyRequest.newBuilder()
                 .addAllMatrix1(list1)
@@ -225,7 +226,7 @@ public class GRPCClientService {
 
                 List<java.lang.Integer> result = multResponse.getMatrixList();
                 int c = 0;
-
+		System.out.println(result.size());
                 for(int i = 0; i < list1.size(); i++){
                         for(int j = 0; j < list1.size(); j++){
                                 A4[i][j] = result.get(c);
@@ -235,6 +236,7 @@ public class GRPCClientService {
 
                 Instant finish = Instant.now();
                 long footprint = Duration.between(start, finish).toMillis();
+		System.out.println("Time measured");
                 return footprint;
         }
 
@@ -250,13 +252,13 @@ public class GRPCClientService {
         }
 
         static void initialiseIPAddresses(List<String> ipAddresses){
-                ipAddresses.add("52.90.0.95");
-                ipAddresses.add("100.26.161.85");
-                ipAddresses.add("100.26.163.20");
-                ipAddresses.add("54.145.28.209");
-                ipAddresses.add("34.228.61.231");
-                ipAddresses.add("3.90.250.154");
-                ipAddresses.add("34.228.185.247");
+                ipAddresses.add("100.26.233.189");
+                ipAddresses.add("100.25.30.211");
+                ipAddresses.add("54.197.90.102");
+                ipAddresses.add("18.234.50.20");
+                ipAddresses.add("18.208.245.244");
+                ipAddresses.add("54.209.29.112");
+                ipAddresses.add("34.228.197.241");
         }
 
         static void initialiseStubs(List<String> ipAddresses, List<MatrixServiceGrpc.MatrixServiceBlockingStub> stubs){
@@ -264,7 +266,7 @@ public class GRPCClientService {
                 MatrixServiceGrpc.MatrixServiceBlockingStub stub;
 
                 for(String address : ipAddresses){
-                        channel = ManagedChannelBuilder.forAddress(address, 8081).usePlaintext().build();
+                        channel = ManagedChannelBuilder.forAddress(address, 9090).usePlaintext().build();
                         stub = MatrixServiceGrpc.newBlockingStub(channel);
                         stubs.add(stub);
                 }
