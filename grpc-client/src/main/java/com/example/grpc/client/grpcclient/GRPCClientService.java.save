@@ -99,14 +99,11 @@ public class GRPCClientService {
 
                 final ArrayList<MatrixServiceGrpc.MatrixServiceBlockingStub> stubs = new ArrayList<>();
                 final ArrayList<MultiplyRequest> requests = new ArrayList<>();
-                final ArrayList<MultiplyResponse> multResponses = new ArrayList<>(7);
-
-		for (int i = 0; i < 7; i++)
-			multResponses.add(null);
+                final ArrayList<MultiplyResponse> multResponses = new ArrayList<>();
 
                 initialiseStubs(ipAddresses, stubs);
 
-                ManagedChannel channel = ManagedChannelBuilder.forAddress("3.91.208.41", 9090).usePlaintext().build();
+                ManagedChannel channel = ManagedChannelBuilder.forAddress("52.23.164.91", 9090).usePlaintext().build();
 		MatrixServiceGrpc.MatrixServiceBlockingStub stub = MatrixServiceGrpc.newBlockingStub(channel);
 
                 ArrayList<java.lang.Integer> listA1 = new ArrayList<>();
@@ -130,6 +127,7 @@ public class GRPCClientService {
 		ArrayList<java.lang.Integer> listD4 = new ArrayList<>();
                 ArrayList<java.lang.Integer> listD5 = new ArrayList<>();
 
+
                 arrayToList(A1, A2, listA1, listA2);
                 arrayToList(A3, A4, listA3, listA4);
                 arrayToList(B1, B2, listB1, listB2);
@@ -141,51 +139,37 @@ public class GRPCClientService {
 
                 addRequests(requests, listA1, listA2, listB1, listB2, listC1, listC2, listD1, listD2);
 
-		System.out.println("Measuring time");
-                int footprint = (int)measureMultTime(stub, listA1, listA2, A4, listA4);
-                System.out.println("Time taken: " + footprint + " Deadline: " + deadline);
-		double numServers = Math.ceil((footprint * 7) / deadline);
-		numServers = numServers == 0.0 ? 1.0 : numServers;
+                long footprint = measureMultTime(stub, listA1, listA2, A4);
+                int numServers = (int)Math.ceil((footprint * 7) / deadline);
+                double multPerServer = 7 / numServers;
 
-		System.out.println("Servers required: " + numServers);
+                StreamObserver<MultiplyRequest> requestObserver;
+                int c = 0, c1 = 0;
+
 		System.out.println("Sending multiply requests");
 
-		try{
-	        	multiply(multResponses, stubs, requests, numServers);
-		}
-		catch(InterruptedException e){
-			System.out.println("Interrupted");
-		}
-
+		t
+	                	multiply(multResponses, stubs, requests, numServers);
 		System.out.println("Sending add requests");
 
                 AddResponse addResponse = stub.add(AddRequest.newBuilder()
-                        .addAllMatrix1(toSmallerIntMatrix(listA4))
-                        .addAllMatrix2(toSmallerMatrix(multResponses.get(0).getMatrixList()).build()));
+                        .addAllMatrix1(listA4)
+                        .addAllMatrix2(listA5).build());
                 listToArray(addResponse.getMatrixList(), A3);
 
-		printMatrix(addResponse.getMatrixList());
-
                 addResponse = stub.add(AddRequest.newBuilder()
-                        .addAllMatrix1(toSmallerMatrix(multResponses.get(1).getMatrixList()))
-                        .addAllMatrix2(toSmallerMatrix(multResponses.get(2).getMatrixList())).build());
+                        .addAllMatrix1(listB4)
+                        .addAllMatrix2(listB5).build());
                 listToArray(addResponse.getMatrixList(), B3);
 
-		printMatrix(addResponse.getMatrixList());
-
                 addResponse = stub.add(AddRequest.newBuilder()
-                        .addAllMatrix1(toSmallerMatrix(multResponses.get(3).getMatrixList()))
-                        .addAllMatrix2(toSmallerMatrix(multResponses.get(4).getMatrixList())).build());
+                        .addAllMatrix1(listC4)
+                        .addAllMatrix2(listC5).build());
                 listToArray(addResponse.getMatrixList(), C3);
-
-		printMatrix(addResponse.getMatrixList());
-
-                addResponse = stub.add(AddRequest.newBuilder()
-                        .addAllMatrix1(toSmallerMatrix(multResponses.get(5).getMatrixList()))
-                        .addAllMatrix2(toSmallerMatrix(multResponses.get(6).getMatrixList())).build());
+                 addResponse = stub.add(AddRequest.newBuilder()
+                        .addAllMatrix1(listD4)
+                        .addAllMatrix2(listD5).build());
                 listToArray(addResponse.getMatrixList(), D3);
-
-		printMatrix(addResponse.getMatrixList());
 
                 channel.shutdown();
 
@@ -217,70 +201,11 @@ public class GRPCClientService {
                         res[i][j]=D3[i-bSize][j-bSize];
                     }
                 }
-        	for (int i=0; i<MAX; i++)
-       		{
-                	for (int j=0; j<MAX;j++)
-                	{
-                        	System.out.print(res[i][j]+" ");
-                	}
-         	       System.out.println("");
-        	}
                 return res;
         }
 
-	static List<int> toSmallerMatrix(List<java.lang.Integer> list){
-		List<int> newList = new ArrayList<int>();
-		int size = Math.sqrt(list.size()), c = 0;
-		for (int i=0; i<size; i++)
-                {
-                        for (int j=0; j<size;j++)
-                        {
-                                newList.add(list.get(c));
-				c++;
-                        }
-			c += size;
-                }
-		return newList;
-	}
-
-        static List<int> toSmallerIntMatrix(List<int> list){
-                List<int> newList = new ArrayList<int>();
-                int size = Math.sqrt(list.size()), c = 0;
-                for (int i=0; i<size; i++)
-                {
-                        for (int j=0; j<size;j++)
-                        {
-                                newList.add(list.get(c));
-				c++;
-                        }
-			c += size;
-                }
-                return newList;
-        }
-
-        static void printMatrix(List<java.lang.Integer> list){
-                int size = (int) Math.sqrt(list.size());
-                int c = 0;
-                for(int i = 0; i < size; i++){
-                        for (int j = 0; j < size; j++){
-                                System.out.print(list.get(c));
-                                c++;
-                        }
-			System.out.println("");
-		}
-        }
-
-        static void fillInResponses(ArrayList<MultiplyResponse> multResponses, List<java.lang.Integer> listA5, List<java.lang.Integer> listB4, List<java.lang.Integer> listB5, List<java.lang.Integer> listC4, List<java.lang.Integer> listC5, List<java.lang.Integer> listD4, List<java.lang.Integer> listD5){
-                listA5 = multResponses.get(0).getMatrixList();
-                listB4 = multResponses.get(1).getMatrixList();
-                listB5 = multResponses.get(2).getMatrixList();
-                listC4 = multResponses.get(3).getMatrixList();
-                listC5 = multResponses.get(4).getMatrixList();
-                listD4 = multResponses.get(5).getMatrixList();
-                listD5 = multResponses.get(6).getMatrixList();
-        }
-
-        static long measureMultTime(MatrixServiceGrpc.MatrixServiceBlockingStub stub, List<java.lang.Integer> list1, List<java.lang.Integer> list2, int[][] A4, List<java.lang.Integer> listA4){
+        static long measureMultTime(MatrixServiceGrpc.MatrixServiceBlockingStub stub, List<java.lang.Integer> list1, List<java.lang.Integer> list2, int[][] A4){
+		System.out.println("Measuring time");
                 Instant start = Instant.now();
                 MultiplyResponse multResponse = stub.multiply(MultiplyRequest.newBuilder()
                 .addAllMatrix1(list1)
@@ -288,22 +213,23 @@ public class GRPCClientService {
 
                 List<java.lang.Integer> result = multResponse.getMatrixList();
                 int c = 0, size = (int)Math.sqrt(A4.length);
-		System.out.println("A4 size: " + result.size());
+		System.out.println(result.size());
                 for(int i = 0; i < size; i++){
                         for(int j = 0; j < size; j++){
-                                listA4.set(c, result.get(c));
+                                A4[i][j] = result.get(c);
                                 c++;
                         }
                 }
 
                 Instant finish = Instant.now();
                 long footprint = Duration.between(start, finish).toMillis();
+		System.out.println("Time measured");
                 return footprint;
         }
 
-        static void multiply(ArrayList<MultiplyResponse> multResponses, ArrayList<MatrixServiceGrpc.MatrixServiceBlockingStub> stubs, ArrayList<MultiplyRequest> requests, double numServers)throws InterruptedException{
-                ExecutorService executor = Executors.newFixedThreadPool((int)numServers);
-		System.out.println("Multiplying");
+        static void multiply(ArrayList<MultiplyResponse> multResponses, ArrayList<MatrixServiceGrpc.MatrixServiceBlockingStub> stubs, ArrayList<MultiplyRequest> requests, int numServers)throws InterruptedException{
+                ExecutorService executor = Executors.newFixedThreadPool(7);
+
                 if(numServers == 1){
                         Runnable runnableTask = () -> {
                                 multResponses.set(0, stubs.get(0).multiply(requests.get(0)));
@@ -313,6 +239,7 @@ public class GRPCClientService {
                                 multResponses.set(4, stubs.get(0).multiply(requests.get(4)));
                                 multResponses.set(5, stubs.get(0).multiply(requests.get(5)));
                                 multResponses.set(6, stubs.get(0).multiply(requests.get(6)));
+                                multResponses.set(7, stubs.get(0).multiply(requests.get(7)));
                         };
                         executor.execute(runnableTask);
                 }
@@ -446,30 +373,28 @@ public class GRPCClientService {
                         executor.execute(runnableTask4);
                         executor.execute(runnableTask5);
                 }
-
-                System.out.println("Awaiting termination");
-                executor.shutdown();
                 executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
-	}
+        }
 
        static void addRequests(ArrayList<MultiplyRequest> requests, List<java.lang.Integer> listA1, List<java.lang.Integer> listA2, List<java.lang.Integer> listB1, List<java.lang.Integer> listB2, List<java.lang.Integer> listC1, List<java.lang.Integer> listC2, List<java.lang.Integer> listD1, List<java.lang.Integer> listD2){
-		requests.add(MultiplyRequest.newBuilder().addAllMatrix1(listA1).addAllMatrix2(listA2).build());
-                requests.add(MultiplyRequest.newBuilder().addAllMatrix1(listB1).addAllMatrix2(listC2).build());
+		requests.add(MultiplyRequest.newBuilder().addAllMatrix1(listB1).addAllMatrix2(listC2).build());
                 requests.add(MultiplyRequest.newBuilder().addAllMatrix1(listA1).addAllMatrix2(listB2).build());
                 requests.add(MultiplyRequest.newBuilder().addAllMatrix1(listB1).addAllMatrix2(listD2).build());
                 requests.add(MultiplyRequest.newBuilder().addAllMatrix1(listC1).addAllMatrix2(listA2).build());
                 requests.add(MultiplyRequest.newBuilder().addAllMatrix1(listD1).addAllMatrix2(listC2).build());
                 requests.add(MultiplyRequest.newBuilder().addAllMatrix1(listC1).addAllMatrix2(listB2).build());
+                requests.add(MultiplyRequest.newBuilder().addAllMatrix1(listD1).addAllMatrix2(listD2).build());
+
         }
 
         static void initialiseIPAddresses(List<String> ipAddresses){
-                ipAddresses.add("18.234.130.166");
-                ipAddresses.add("3.83.245.179");
-                ipAddresses.add("54.90.1.113");
-                ipAddresses.add("54.226.16.179");
-                ipAddresses.add("54.160.128.185");
-                ipAddresses.add("3.80.27.51");
-                ipAddresses.add("54.90.71.92");
+                ipAddresses.add("100.26.233.189");
+                ipAddresses.add("100.25.30.211");
+                ipAddresses.add("54.197.90.102");
+                ipAddresses.add("18.234.50.20");
+                ipAddresses.add("18.208.245.244");
+                ipAddresses.add("54.209.29.112");
+                ipAddresses.add("34.228.197.241");
         }
 
         static void initialiseStubs(List<String> ipAddresses, List<MatrixServiceGrpc.MatrixServiceBlockingStub> stubs){

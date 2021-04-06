@@ -9,14 +9,36 @@ import io.grpc.stub.StreamObserver;
 public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase{
         @Override
         public void add(AddRequest request, StreamObserver<AddResponse> reply){
-                List<java.lang.Integer> matrix1 = request.getMatrix1List();
+                System.out.println("Add request received");
+		List<java.lang.Integer> matrix1 = request.getMatrix1List();
                 List<java.lang.Integer> matrix2 = request.getMatrix2List();
-                int size = (int)Math.sqrt(matrix1.size());
+                int size = (int)Math.sqrt(matrix1.size()), c = 0;
+
+		System.out.println("matrix1: ");
+		for(int i = 0; i < size; i++){
+                        for(int j = 0; j < size; j++){
+                                System.out.print(matrix1.get(c));
+                                c++;
+                        }
+			System.out.println("");
+                }
+		c = 0;
+
+		System.out.println("matrix2: ");
+                for(int i = 0; i < size; i++){
+                        for(int j = 0; j < size; j++){
+                                System.out.print(matrix2.get(c));
+                                c++;
+                        }
+                        System.out.println("");
+                }
+
+		System.out.println("size: " + size);
 
                 int C[][] = new int[size * 2][size * 2];
                 int A[][] = new int[size][size];
                 int B[][] = new int[size][size];
-                int c = 0;
+                c = 0;
 
                 for(int i = 0; i < size; i++){
                         for(int j = 0; j < size; j++){
@@ -26,13 +48,27 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase{
                         }
                 }
 
-                List<java.lang.Integer> result = new ArrayList<>(C.length);
+                List<java.lang.Integer> result = new ArrayList<>();
                 for (int i=0;i<A.length;i++)
                 {
                         for (int j=0;j<A.length;j++)
                         {
-                                result.add(A[i][j]+B[i][j]);
+				C[i][j] = A[i][j]+B[i][j];
                         }
+                }
+
+		for(int i = 0; i < C.length; i++)
+			for(int j = 0; j < C.length; j++)
+				result.add(C[i][j]);
+
+		c = 0;
+		System.out.println("result: ");
+                for(int i = 0; i < size; i++){
+                        for(int j = 0; j < size; j++){
+                                System.out.print(result.get(c));
+                                c++;
+                        }
+                        System.out.println("");
                 }
 
                 AddResponse response = AddResponse.newBuilder().addAllMatrix(result).build();
@@ -42,7 +78,7 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase{
 
         @Override
         public void multiply(MultiplyRequest request, StreamObserver<MultiplyResponse> reply){
-		System.out.println("Request received");
+		System.out.println("Multiply request received");
                 List<java.lang.Integer> matrix1 = request.getMatrix1List();
                 List<java.lang.Integer> matrix2 = request.getMatrix2List();
                 int size = (int)Math.sqrt(matrix1.size());
@@ -50,6 +86,27 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase{
                 int A[][] = new int[size][size];
                 int B[][] = new int[size][size];
                 int c = 0;
+
+                System.out.println("matrix1: ");
+                for(int i = 0; i < size; i++){
+                        for(int j = 0; j < size; j++){
+                                System.out.print(matrix1.get(c));
+                                c++;
+                        }
+                        System.out.println("");
+                }
+
+                c = 0;
+                System.out.println("matrix2: ");
+                for(int i = 0; i < size; i++){
+                        for(int j = 0; j < size; j++){
+                                System.out.print(matrix2.get(c));
+                                c++;
+                        }
+                        System.out.println("");
+                }
+
+		c = 0;
 		System.out.println(size);
                 for(int i = 0; i < size; i++){
                         for(int j = 0; j < size; j++){
@@ -68,9 +125,12 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase{
                                         value += A[i][k] * B[k][j];
                                 }
                                 C[i][j] = value;
-                                result.add(value);
                         }
                 }
+
+                for(int i = 0; i < C.length; i++)
+                        for(int j = 0; j < C.length; j++)
+                                result.add(C[i][j]);
 
                 MultiplyResponse response = MultiplyResponse.newBuilder().addAllMatrix(result).build();
                 reply.onNext(response);
