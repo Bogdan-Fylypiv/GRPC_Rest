@@ -9,7 +9,8 @@ import io.grpc.stub.StreamObserver;
 public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase{
         @Override
         public void add(AddRequest request, StreamObserver<AddResponse> reply){
-                List<java.lang.Integer> matrix1 = request.getMatrix1List();
+                System.out.println("Add request received");
+		List<java.lang.Integer> matrix1 = request.getMatrix1List();
                 List<java.lang.Integer> matrix2 = request.getMatrix2List();
                 int size = (int)Math.sqrt(matrix1.size());
 
@@ -26,14 +27,18 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase{
                         }
                 }
 
-                List<java.lang.Integer> result = new ArrayList<>(C.length);
+                List<java.lang.Integer> result = new ArrayList<>();
                 for (int i=0;i<A.length;i++)
                 {
                         for (int j=0;j<A.length;j++)
                         {
-                                result.add(A[i][j]+B[i][j]);
+				C[i][j] = A[i][j]+B[i][j];
                         }
                 }
+
+		for(int i = 0; i < C.length; i++)
+			for(int j = 0; j < C.length; j++)
+				result.add(C[i][j]);
 
                 AddResponse response = AddResponse.newBuilder().addAllMatrix(result).build();
                 reply.onNext(response);
@@ -42,7 +47,7 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase{
 
         @Override
         public void multiply(MultiplyRequest request, StreamObserver<MultiplyResponse> reply){
-		System.out.println("Request received");
+		System.out.println("Multiply request received");
                 List<java.lang.Integer> matrix1 = request.getMatrix1List();
                 List<java.lang.Integer> matrix2 = request.getMatrix2List();
                 int size = (int)Math.sqrt(matrix1.size());
@@ -68,9 +73,12 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase{
                                         value += A[i][k] * B[k][j];
                                 }
                                 C[i][j] = value;
-                                result.add(value);
                         }
                 }
+
+                for(int i = 0; i < C.length; i++)
+                        for(int j = 0; j < C.length; j++)
+                                result.add(C[i][j]);
 
                 MultiplyResponse response = MultiplyResponse.newBuilder().addAllMatrix(result).build();
                 reply.onNext(response);
