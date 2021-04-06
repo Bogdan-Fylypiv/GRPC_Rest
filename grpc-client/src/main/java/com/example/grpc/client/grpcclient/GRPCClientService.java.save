@@ -99,10 +99,7 @@ public class GRPCClientService {
 
                 final ArrayList<MatrixServiceGrpc.MatrixServiceBlockingStub> stubs = new ArrayList<>();
                 final ArrayList<MultiplyRequest> requests = new ArrayList<>();
-                final ArrayList<MultiplyResponse> multResponses = new ArrayList<>(7);
-
-		for (int i = 0; i < 7; i++)
-			multResponses.add(null);
+                final ArrayList<MultiplyResponse> multResponses = new ArrayList<>();
 
                 initialiseStubs(ipAddresses, stubs);
 
@@ -142,27 +139,17 @@ public class GRPCClientService {
 
                 addRequests(requests, listA1, listA2, listB1, listB2, listC1, listC2, listD1, listD2);
 
-
-		System.out.println("Measuring time");
-                int footprint = (int)measureMultTime(stub, listA1, listA2, A4);
-                System.out.println("Time taken: " + footprint);
-		double numServers = Math.ceil((footprint * 7) / deadline);
-		numServers = numServers == 0.0 ? 1.0 : numServers;
-
-		System.out.println("Servers required: " + numServers);
+                long footprint = measureMultTime(stub, listA1, listA2, A4);
+                int numServers = (int)Math.ceil((footprint * 7) / deadline);
+                double multPerServer = 7 / numServers;
 
                 StreamObserver<MultiplyRequest> requestObserver;
                 int c = 0, c1 = 0;
 
 		System.out.println("Sending multiply requests");
 
-		try{
-	        	multiply(multResponses, stubs, requests, numServers);
-		}
-		catch(InterruptedException e){
-			System.out.println("Interrupted");
-		}
-
+		t
+	                	multiply(multResponses, stubs, requests, numServers);
 		System.out.println("Sending add requests");
 
                 AddResponse addResponse = stub.add(AddRequest.newBuilder()
@@ -218,6 +205,7 @@ public class GRPCClientService {
         }
 
         static long measureMultTime(MatrixServiceGrpc.MatrixServiceBlockingStub stub, List<java.lang.Integer> list1, List<java.lang.Integer> list2, int[][] A4){
+		System.out.println("Measuring time");
                 Instant start = Instant.now();
                 MultiplyResponse multResponse = stub.multiply(MultiplyRequest.newBuilder()
                 .addAllMatrix1(list1)
@@ -235,12 +223,13 @@ public class GRPCClientService {
 
                 Instant finish = Instant.now();
                 long footprint = Duration.between(start, finish).toMillis();
+		System.out.println("Time measured");
                 return footprint;
         }
 
-        static void multiply(ArrayList<MultiplyResponse> multResponses, ArrayList<MatrixServiceGrpc.MatrixServiceBlockingStub> stubs, ArrayList<MultiplyRequest> requests, double numServers)throws InterruptedException{
+        static void multiply(ArrayList<MultiplyResponse> multResponses, ArrayList<MatrixServiceGrpc.MatrixServiceBlockingStub> stubs, ArrayList<MultiplyRequest> requests, int numServers)throws InterruptedException{
                 ExecutorService executor = Executors.newFixedThreadPool(7);
-		System.out.println("Multiplying");
+
                 if(numServers == 1){
                         Runnable runnableTask = () -> {
                                 multResponses.set(0, stubs.get(0).multiply(requests.get(0)));
