@@ -143,7 +143,7 @@ public class GRPCClientService {
 
                 int footprint = (int)measureMultTime(stub, listA1, listA2, A4, listA4);
 		int numServers = (int)Math.ceil((footprint * 7.0) / (deadline*1.0));
-		numServers = numServers < 1 ? 1 : numServers;
+		numServers = numServers == 0 ? 1 : numServers;
 		numServers = numServers > 7 ? 7 : numServers;
 
 		System.out.println("Footprint: " + footprint + "Servers required: " + numServers);

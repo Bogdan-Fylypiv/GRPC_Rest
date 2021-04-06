@@ -46,7 +46,7 @@ public class MatrixEndpoint {
                                 throw new IllegalArgumentException("Wrong arguments");
                         int[][] result = this.grpcClientService.multiplyMatrixBlock(matrix1, matrix2, deadlineParam);
 
-                        return new ResponseEntity<>(Arrays.toString(result), HttpStatus.OK);
+                        return new ResponseEntity<>(squareMatrixToString(result), HttpStatus.OK);
                 }
                 catch(IOException e){
                         return new ResponseEntity<>("IOException", HttpStatus.BAD_REQUEST);
@@ -61,10 +61,19 @@ public class MatrixEndpoint {
 			printWriter.flush();
 
 			String stackTrace = writer.toString();
-			return new ResponseEntity<>(stackTrace, HttpStatus.OK);
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.OK);
 		}
-
         }
+
+	static String squareMatrixToString(int [][] matrix){
+		String mat = "";
+		for(int i = 0; i < matrix.length; i++){
+			for(int j = 0; j < matrix.length; j++)
+				mat = mat + matrix[i][j] + " ";
+			mat += "\n";
+		}
+		return mat;
+	}
 
         static int[][] toSquareMatrix(String matStr){
                 String lines[] =  matStr.split("\\r?\\n");
